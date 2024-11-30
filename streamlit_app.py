@@ -11,13 +11,6 @@ matplotlib.rcParams['font.sans-serif'] = ['Microsoft YaHei']  # 或其他安装�
 matplotlib.rcParams['axes.unicode_minus'] = False  # 解决负号显示问题
 
 
-# 测试绘图
-matplotlib.figure()
-matplotlib.plot([1, 2, 3], [4, 5, 6])
-matplotlib.title('测试中文标题')  # 这里应该能正确显示中文
-matplotlib.show()
-
-
 
 # 标题和简介
 st.title('热电模块性能计算-20241130-wjj')
