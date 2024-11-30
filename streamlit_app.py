@@ -6,7 +6,8 @@ from scipy.integrate import quad
 
 
 # 设置字体为宋体
-matplotlib.rcParams['font.sans-serif'] = ['SimSun']  # 中文宋体
+plt.rcParams['font.sans-serif'] = ['SimHei']
+
 matplotlib.rcParams['axes.unicode_minus'] = False   # 解决负号显示问题
 
 
@@ -643,10 +644,7 @@ with st.expander("温度曲线图"):
 
 
 
-# 使用
-import matplotlib.font_manager as fm
-fonts = fm.findSystemFonts()
-st.write("### fonts")
+
 
 
 
