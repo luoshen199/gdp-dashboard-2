@@ -5,6 +5,17 @@ import streamlit as st
 from scipy.integrate import quad
 
 
+import matplotlib.font_manager as fm
+
+
+# 获取所有可用的字体路径
+fonts = fm.findSystemFonts()
+
+# 打印到Streamlit界面
+st.write("可用的字体路径如下：")
+st.write(fonts)
+
+
 # 设置字体为宋体
 plt.rcParams['font.sans-serif'] = ['SimHei']
 
