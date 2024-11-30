@@ -5,8 +5,9 @@ import streamlit as st
 from scipy.integrate import quad
 
 
-# 设置字体为宋体
-plt.rcParams['font.sans-serif'] = ['SimHei']
+# 设置字体为谷歌体
+plt.rcParams['font.sans-serif'] = ['Noto Sans CJK']
+
 
 matplotlib.rcParams['axes.unicode_minus'] = False   # 解决负号显示问题
 
