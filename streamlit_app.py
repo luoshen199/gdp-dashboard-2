@@ -10,12 +10,6 @@ from scipy.integrate import quad
 plt.rcParams['font.sans-serif'] = ['Microsoft YaHei']  # 或其他安装的中文字体
 plt.rcParams['axes.unicode_minus'] = False  # 解决负号显示问题
 
-# 测试绘图
-plt.figure()
-plt.plot([1, 2, 3], [4, 5, 6])
-plt.title('测试中文标题')  # 这里应该能正确显示中文
-plt.show()
-
 
 
 
@@ -649,15 +643,6 @@ with st.expander("温度曲线图"):
     ax.set_title('最大效率随温度变化')
     ax.legend()
     st.pyplot(fig)
-
-
-
-# 测试绘图
-plt.figure()
-plt.plot([1, 2, 3], [4, 5, 6])
-plt.title('测试中文标题')  # 这里应该能正确显示中文
-plt.show()
-
 
 
 
