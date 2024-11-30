@@ -4,15 +4,25 @@ import matplotlib
 import streamlit as st
 from scipy.integrate import quad
 
-# 设置字体为宋体
 
 from matplotlib import font_manager
 
-font_path = '字体/SimHei.ttf'
+# 设置字体路径
+font_path = 'SourceHanSansSC-Bold.otf'
 font_manager.fontManager.addfont(font_path)
+plt.rcParams['font.family'] = font_manager.FontProperties(fname=font_path).get_name()
+plt.rcParams['axes.unicode_minus'] = False  # 解决负号显示问题
 
-plt.rcParams['font.sans-serif'] = ['SimHei']  # 使用SimHei字体显示中文
-plt.rcParams['axes.unicode_minus'] = False  # 禁用axes的unicode_minus属性，防止负号乱码
+# 测试绘图
+import numpy as np
+x = np.arange(1, 11)
+y = 2 * x + 5
+plt.title("菜鸟教程 - 测试")
+plt.xlabel("x 轴")
+plt.ylabel("y 轴")
+plt.plot(x, y)
+plt.show()
+
 
 
 # 标题和简介
