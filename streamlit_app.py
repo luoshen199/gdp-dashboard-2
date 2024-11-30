@@ -4,14 +4,11 @@ import matplotlib
 import streamlit as st
 from scipy.integrate import quad
 
+# 设置字体为宋体
 
-
-# 设置全局字体，使用下载的 SourceHanSansSC-Bold.otf
-zhfont1 = matplotlib.font_manager.FontProperties(fname="SourceHanSansSC-Bold.otf")
-
-# 设置全局字体
-plt.rcParams['font.family'] = zhfont1.get_name()  # 设置字体
-plt.rcParams['axes.unicode_minus'] = False  # 解决负号显示问题
+mpl.font_manager.fontManager.addfont('字体/SimHei.ttf')  # 注册SimHei字体
+plt.rcParams['font.sans-serif']=['SimHei']  # 设置字体为SimHei
+matplotlib.rcParams['axes.unicode_minus'] = False   # 解决负号显示问题
 
 # 标题和简介
 st.title(u'热电模块性能计算-20241130-wjj')
