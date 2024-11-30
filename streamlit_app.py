@@ -643,7 +643,10 @@ with st.expander("温度曲线图"):
 
 
 
-
+# 使用
+import matplotlib.font_manager as fm
+fonts = fm.findSystemFonts()
+st.write("### fonts")
 
 
 
