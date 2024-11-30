@@ -462,6 +462,12 @@ with st.expander("计算结果", expanded=True):
 
 
 # 计算ZT
+# 设置为已安装的支持中文的字体
+matplotlib.rcParams['font.sans-serif'] = ['Arial Unicode MS'] # 或其他安装的中文字体
+matplotlib.rcParams['axes.unicode_minus'] = False  # 解决负号显示问题
+
+
+
 def calculate_ZT(T_range, a_n, b_n, c_n, d_n, a_p, b_p, c_p, d_p, 
                  rho_a_n, rho_b_n, rho_c_n, rho_d_n, rho_a_p, rho_b_p, rho_c_p, rho_d_p, 
                  lambda_a_n, lambda_b_n, lambda_c_n, lambda_d_n, lambda_a_p, lambda_b_p, lambda_c_p, lambda_d_p):
