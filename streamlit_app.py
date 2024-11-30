@@ -7,15 +7,15 @@ from scipy.integrate import quad
 
 
 # 设置为已安装的支持中文的字体
-plt.rcParams['font.sans-serif'] = ['Microsoft YaHei']  # 或其他安装的中文字体
-plt.rcParams['axes.unicode_minus'] = False  # 解决负号显示问题
+matplotlib.rcParams['font.sans-serif'] = ['Microsoft YaHei']  # 或其他安装的中文字体
+matplotlib.rcParams['axes.unicode_minus'] = False  # 解决负号显示问题
 
 
 # 测试绘图
-plt.figure()
-plt.plot([1, 2, 3], [4, 5, 6])
-plt.title('测试中文标题')  # 这里应该能正确显示中文
-plt.show()
+matplotlib.figure()
+matplotlib.plot([1, 2, 3], [4, 5, 6])
+matplotlib.title('测试中文标题')  # 这里应该能正确显示中文
+matplotlib.show()
 
 
 
