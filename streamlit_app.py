@@ -5,15 +5,14 @@ import streamlit as st
 from scipy.integrate import quad
 
 
+# 设置字体为宋体
+plt.rcParams['font.sans-serif'] = ['SimHei']
 
-# 设置为已安装的支持中文的字体
-matplotlib.rcParams['font.sans-serif'] = ['Arial Unicode MS'] # 或其他安装的中文字体
-matplotlib.rcParams['axes.unicode_minus'] = False  # 解决负号显示问题
-
+matplotlib.rcParams['axes.unicode_minus'] = False   # 解决负号显示问题
 
 
 # 标题和简介
-st.title('热电模块性能计算-20241130-wjj')
+st.title(u'热电模块性能计算-20241130-wjj')
 st.write('这个应用程序允许用户输入温差电池的尺寸、温度以及物料属性，计算和展示热电模块的性能参数。')
 
 # 显示公式
@@ -212,16 +211,24 @@ lambda_a_n, lambda_b_n, lambda_c_n, lambda_d_n = 0, 2.36e-5, - 0.015, 3.806
 lambda_a_p, lambda_b_p, lambda_c_p, lambda_d_p = 0, 3.2e-5, - 0.0216, 4.949
 
 # 用户输入温度
+
 with st.expander("输入温度参数", expanded=True):
+    col1, col2 = st.columns(2)
+with col1:
     T_h = st.number_input('热端温度 (K)', value=373.0, format="%f")
+with col2:
     T_c = st.number_input('冷端温度 (K)', value=273.0, format="%f")
     T_avg = (T_h + T_c) / 2
 
 # 用户输入材料尺寸
 with st.expander("输入材料尺寸"):
+        col1, col2, col3 = st.columns(3)
+with col1:
     L = st.number_input('长度 (m)', value=0.01, format="%f")
+with col2:
     W = st.number_input('宽度 (m)', value=0.01, format="%f")
-    H = st.number_input('高度 (m) [注意：高度为P和N型材料或的高度]', value=0.002, format="%f")
+with col3:
+    H = st.number_input('P/N高度 (m)', value=0.002, format="%f")
     A = W * L  # 计算截面积
 
 # 用户输入公式系数
@@ -236,24 +243,28 @@ with st.expander("输入Seebeck系数公式参数"):
     a_n = -1.045 \times 10^{-11} T^3 + 9.337 \times 10^{-9} T^2 - 2.649 \times 10^{-6} T + 4.4603 \times 10^{-4}
     ''')
 
-    col1, col2 = st.columns(2)
+    col1, col2, col3, col4 = st.columns(4)
     with col1:
         a_n = st.number_input('a_n', value=a_n, format="%e")
-        b_n = st.number_input('b_n', value=b_n, format="%e")
     with col2:
+        b_n = st.number_input('b_n', value=b_n, format="%e")
+    with col3:
         c_n = st.number_input('c_n', value=c_n, format="%e")
+    with col4:
         d_n = st.number_input('d_n', value=d_n, format="%e")
 
     st.write("#### P型材料Seebeck系数公式系数")
     st.latex(r'''
     a_p = -6.373 \times 10^{-12} T^3 + 3.59 \times 10^{-9} T^2 - 9.24 \times 10^{-8} T + 8.4605 \times 10^{-5}
     ''')
-    col3, col4 = st.columns(2)
-    with col3:
+    col5, col6, col7, col8 = st.columns(4)
+    with col5:
         a_p = st.number_input('a_p', value=a_p, format="%e")
+    with col6:
         b_p = st.number_input('b_p', value=b_p, format="%e")
-    with col4:
+    with col7:
         c_p = st.number_input('c_p', value=c_p, format="%e")
+    with col8:
         d_p = st.number_input('d_p', value=d_p, format="%e")
 
 
@@ -265,9 +276,9 @@ with st.expander("输入Seebeck系数公式参数"):
     fig, ax = plt.subplots(figsize=(8, 6))
     ax.plot(T_range, alpha_n_values, label=r'N型 α', color='blue')
     ax.plot(T_range, alpha_p_values, label=r'P型 α', color='red')
-    ax.set_xlabel('温度 (K)')
-    ax.set_ylabel('Seebeck 系数 (V/K)')
-    ax.set_title('Seebeck 系数随温度变化')
+    ax.set_xlabel(u'温度 (K)')
+    ax.set_ylabel(u'Seebeck 系数 (V/K)')
+    ax.set_title(u'Seebeck 系数随温度变化')
     ax.legend()
     st.pyplot(fig)
 
@@ -282,19 +293,29 @@ with st.expander("输入电阻率公式系数（可选）"):
     st.latex(r'''
     \rho_n = -2.5786 \times 10^{-13} T^3 + 1.9767 \times 10^{-10} T^2 - 6.0208 \times 10^{-9} T + 5.7588 \times 10^{-7}
     ''')
-    rho_a_n = st.number_input('ρ_a_n', value=rho_a_n, format="%e")
-    rho_b_n = st.number_input('ρ_b_n', value=rho_b_n, format="%e")
-    rho_c_n = st.number_input('ρ_c_n', value=rho_c_n, format="%e")
-    rho_d_n = st.number_input('ρ_d_n', value=rho_d_n, format="%e")
+    col1, col2, col3, col4 = st.columns(4)
+    with col1:
+        rho_a_n = st.number_input('ρ_a_n', value=rho_a_n, format="%e")
+    with col2:
+        rho_b_n = st.number_input('ρ_b_n', value=rho_b_n, format="%e")
+    with col3:
+        rho_c_n = st.number_input('ρ_c_n', value=rho_c_n, format="%e")
+    with col4:
+        rho_d_n = st.number_input('ρ_d_n', value=rho_d_n, format="%e")
 
     st.write("#### P型材料电阻率公式系数")
     st.latex(r'''
     \rho_p = -7.9299 \times 10^{-13} T^3 + 8.6932 \times 10^{-10} T^2 - 2.506 \times 10^{-7} T + 2.8215 \times 10^{-5}
     ''')
-    rho_a_p = st.number_input('ρ_a_p', value=rho_a_p, format="%e")
-    rho_b_p = st.number_input('ρ_b_p', value=rho_b_p, format="%e")
-    rho_c_p = st.number_input('ρ_c_p', value=rho_c_p, format="%e")
-    rho_d_p = st.number_input('ρ_d_p', value=rho_d_p, format="%e")
+    col5, col6, col7, col8 = st.columns(4)
+    with col5:
+        rho_a_p = st.number_input('ρ_a_p', value=rho_a_p, format="%e")
+    with col6:
+        rho_b_p = st.number_input('ρ_b_p', value=rho_b_p, format="%e")
+    with col7:
+        rho_c_p = st.number_input('ρ_c_p', value=rho_c_p, format="%e")
+    with col8:
+        rho_d_p = st.number_input('ρ_d_p', value=rho_d_p, format="%e")
 
 
 # 计算电阻率数据
@@ -304,9 +325,9 @@ with st.expander("输入电阻率公式系数（可选）"):
     fig, ax = plt.subplots(figsize=(8, 6))
     ax.plot(T_range, rho_n_values, label=r'N型 ρ', color='orange')
     ax.plot(T_range, rho_p_values, label=r'P型 ρ', color='brown')
-    ax.set_xlabel('温度 (K)')
-    ax.set_ylabel('电阻率 (Ω·m)')
-    ax.set_title('电阻率随温度变化')
+    ax.set_xlabel(u'温度 (K)')
+    ax.set_ylabel(u'电阻率 (Ω·m)')
+    ax.set_title(u'电阻率随温度变化')
     ax.legend()
     st.pyplot(fig)
 
@@ -316,19 +337,30 @@ with st.expander("输入导热率公式系数（可选）"):
     st.latex(r'''
     \lambda_n = 2.36 \times 10^{-5} T^2 - 0.015 T + 3.806
     ''')
-    lambda_a_n = st.number_input('ρ_a_n', value=lambda_a_n, format="%e")
-    lambda_b_n = st.number_input('ρ_b_n', value=lambda_b_n, format="%e")
-    lambda_c_n = st.number_input('ρ_c_n', value=lambda_c_n, format="%e")
-    lambda_d_n = st.number_input('ρ_d_n', value=lambda_d_n, format="%e")
+    col1, col2, col3, col4 = st.columns(4)
+    with col1:
+        lambda_a_n = st.number_input('ρ_a_n', value=lambda_a_n, format="%e")
+    with col2:
+        lambda_b_n = st.number_input('ρ_b_n', value=lambda_b_n, format="%e")
+    with col3:
+        lambda_c_n = st.number_input('ρ_c_n', value=lambda_c_n, format="%e")
+    with col4:
+        lambda_d_n = st.number_input('ρ_d_n', value=lambda_d_n, format="%e")
 
     st.write("#### P型材料导热率公式系数")
     st.latex(r'''
     \lambda_p = 3.2 \times 10^{-5} T^2 - 0.0216 T + 4.949
     ''')
-    lambda_a_p = st.number_input('ρ_a_p', value=lambda_a_p, format="%e")
-    lambda_b_p = st.number_input('ρ_b_p', value=lambda_b_p, format="%e")
-    lambda_c_p = st.number_input('ρ_c_p', value=lambda_c_p, format="%e")
-    lambda_d_p = st.number_input('ρ_d_p', value=lambda_d_p, format="%e")
+
+    col5, col6, col7, col8 = st.columns(4)
+    with col5:
+        lambda_a_p = st.number_input('ρ_a_p', value=lambda_a_p, format="%e")
+    with col6:
+        lambda_b_p = st.number_input('ρ_b_p', value=lambda_b_p, format="%e")
+    with col7:
+        lambda_c_p = st.number_input('ρ_c_p', value=lambda_c_p, format="%e")
+    with col8:
+        lambda_d_p = st.number_input('ρ_d_p', value=lambda_d_p, format="%e")
 # 计算导热率数据
     lambda_n_values = calculate_coefficient(T_range, lambda_a_n, lambda_b_n, lambda_c_n, lambda_d_n)
     lambda_p_values = calculate_coefficient(T_range, lambda_a_p, lambda_b_p, lambda_c_p, lambda_d_p)
@@ -336,9 +368,9 @@ with st.expander("输入导热率公式系数（可选）"):
     fig, ax = plt.subplots(figsize=(8, 6))
     ax.plot(T_range, lambda_n_values, label=r'N型 λ', color='green')
     ax.plot(T_range, lambda_p_values, label=r'P型 λ', color='purple')
-    ax.set_xlabel('温度 (K)')
-    ax.set_ylabel('热导率 (W/m·K)')
-    ax.set_title('热导率随温度变化')
+    ax.set_xlabel(u'温度 (K)')
+    ax.set_ylabel(u'热导率 (W/m·K)')
+    ax.set_title(u'热导率随温度变化')
     ax.legend()
     st.pyplot(fig)
 
@@ -462,8 +494,6 @@ with st.expander("计算结果", expanded=True):
 
 
 # 计算ZT
-
-
 def calculate_ZT(T_range, a_n, b_n, c_n, d_n, a_p, b_p, c_p, d_p, 
                  rho_a_n, rho_b_n, rho_c_n, rho_d_n, rho_a_p, rho_b_p, rho_c_p, rho_d_p, 
                  lambda_a_n, lambda_b_n, lambda_c_n, lambda_d_n, lambda_a_p, lambda_b_p, lambda_c_p, lambda_d_p):
@@ -496,9 +526,9 @@ with st.expander("温度曲线图"):
 # 绘制ZT曲线图
     fig, ax = plt.subplots(figsize=(8, 6))
     ax.plot(T_range, ZT_values, label=r'ZT（P和N）', color='green')
-    ax.set_xlabel('温度 (K)')
-    ax.set_ylabel('ZT 值')
-    ax.set_title('ZT 随温度变化')
+    ax.set_xlabel(u'温度 (K)')
+    ax.set_ylabel(u'ZT 值')
+    ax.set_title(u'ZT 随温度变化')
     ax.legend()
     st.pyplot(fig)
 
@@ -591,9 +621,9 @@ with st.expander("温度曲线图"):
     # 绘制电压关于温度的曲线
     fig, ax = plt.subplots(figsize=(8, 6))
     ax.plot(T_range, voltage_values, label='电压 U', color='purple')
-    ax.set_xlabel('温度 (K)')
-    ax.set_ylabel('电压 (V)')
-    ax.set_title('电压随温度变化')
+    ax.set_xlabel(u'温度 (K)')
+    ax.set_ylabel(u'电压 (V)')
+    ax.set_title(u'电压随温度变化')
     ax.legend()
     st.pyplot(fig)
 
@@ -615,9 +645,9 @@ with st.expander("温度曲线图"):
     # 绘制最大功率曲线
     fig, ax = plt.subplots(figsize=(8, 6))
     ax.plot(T_range, P_max_values, label='最大功率 P', color='blue')  # 使用普通文本而不是LaTeX
-    ax.set_xlabel('温度 (K)')
-    ax.set_ylabel('最大功率 (W)')
-    ax.set_title('最大功率随温度变化')
+    ax.set_xlabel(u'温度 (K)')
+    ax.set_ylabel(u'最大功率 (W)')
+    ax.set_title(u'最大功率随温度变化')
     ax.legend()
     st.pyplot(fig)
 
@@ -629,9 +659,9 @@ with st.expander("温度曲线图"):
     ax.plot(T_range, Q_Seebeck_values, label='Seebeck效应热流 QSeebeck', color='orange')  # 使用普通文本
     ax.plot(T_range, Q_conductive_values, label='热导热流 Qconductive', color='purple')  # 使用普通文本
     ax.plot(T_range, Q_joule_values, label='焦耳热流 Qjoule', color='brown')  # 使用普通文本
-    ax.set_xlabel('温度 (K)')
-    ax.set_ylabel('热流 (W)')
-    ax.set_title('不同热流随温度变化')
+    ax.set_xlabel(u'温度 (K)')
+    ax.set_ylabel(u'热流 (W)')
+    ax.set_title(u'不同热流随温度变化')
     ax.legend()
     st.pyplot(fig)
 
@@ -639,11 +669,25 @@ with st.expander("温度曲线图"):
     # 绘制最大效率曲线
     fig, ax = plt.subplots(figsize=(8, 6))
     ax.plot(T_range, efficiency_values, label='最大效率 η', color='red')  # 使用普通文本而不是LaTeX
-    ax.set_xlabel('温度 (K)')
-    ax.set_ylabel('效率')
-    ax.set_title('最大效率随温度变化')
+    ax.set_xlabel(u'温度 (K)')
+    ax.set_ylabel(u'效率')
+    ax.set_title(u'最大效率随温度变化')
     ax.legend()
     st.pyplot(fig)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
