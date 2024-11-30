@@ -3,23 +3,20 @@ import matplotlib.pyplot as plt
 import matplotlib
 import streamlit as st
 from scipy.integrate import quad
+import matplotlib.pyplot as plt
+import matplotlib
+
+# 设置为已安装的支持中文的字体
+plt.rcParams['font.sans-serif'] = ['Microsoft YaHei']  # 或其他安装的中文字体
+plt.rcParams['axes.unicode_minus'] = False  # 解决负号显示问题
+
+# 测试绘图
+plt.figure()
+plt.plot([1, 2, 3], [4, 5, 6])
+plt.title('测试中文标题')  # 这里应该能正确显示中文
+plt.show()
 
 
-import matplotlib.font_manager as fm
-
-
-# 获取所有可用的字体路径
-fonts = fm.findSystemFonts()
-
-# 打印到Streamlit界面
-st.write("可用的字体路径如下：")
-st.write(fonts)
-
-
-# 设置字体为宋体
-plt.rcParams['font.sans-serif'] = ['SimHei']
-
-matplotlib.rcParams['axes.unicode_minus'] = False   # 解决负号显示问题
 
 
 # 标题和简介
