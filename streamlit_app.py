@@ -3,8 +3,8 @@ import matplotlib.pyplot as plt
 import matplotlib
 import streamlit as st
 from scipy.integrate import quad
-import matplotlib.pyplot as plt
-import matplotlib
+
+
 
 # 设置为已安装的支持中文的字体
 plt.rcParams['font.sans-serif'] = ['Microsoft YaHei']  # 或其他安装的中文字体
