@@ -5,10 +5,19 @@ import streamlit as st
 from scipy.integrate import quad
 
 
-# 设置字体为谷歌体
-plt.rcParams['font.sans-serif'] = ['Noto Sans CJK']
 
 
+import numpy as np 
+from matplotlib import pyplot as plt 
+import matplotlib
+ 
+# fname 为 你下载的字体库路径，注意 SourceHanSansSC-Bold.otf 字体的路径
+zhfont1 = matplotlib.font_manager.FontProperties(fname="SourceHanSansSC-Bold.otf") 
+ 
+
+
+
+plt.rcParams['font.sans-serif'] = ['zhfont1']
 matplotlib.rcParams['axes.unicode_minus'] = False   # 解决负号显示问题
 
 
