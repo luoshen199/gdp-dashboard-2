@@ -6,9 +6,14 @@ from scipy.integrate import quad
 
 # 设置字体为宋体
 
-mpl.font_manager.fontManager.addfont('字体/SimHei.ttf')  # 注册SimHei字体
-plt.rcParams['font.sans-serif']=['SimHei']  # 设置字体为SimHei
-matplotlib.rcParams['axes.unicode_minus'] = False   # 解决负号显示问题
+from matplotlib import font_manager
+
+font_path = '字体/SimHei.ttf'
+font_manager.fontManager.addfont(font_path)
+
+plt.rcParams['font.sans-serif'] = ['SimHei']  # 使用SimHei字体显示中文
+plt.rcParams['axes.unicode_minus'] = False  # 禁用axes的unicode_minus属性，防止负号乱码
+
 
 # 标题和简介
 st.title(u'热电模块性能计算-20241130-wjj')
