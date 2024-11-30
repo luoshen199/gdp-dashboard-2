@@ -6,20 +6,12 @@ from scipy.integrate import quad
 
 
 
+# 设置全局字体，使用下载的 SourceHanSansSC-Bold.otf
+zhfont1 = matplotlib.font_manager.FontProperties(fname="SourceHanSansSC-Bold.otf")
 
-import numpy as np 
-from matplotlib import pyplot as plt 
-import matplotlib
- 
-# fname 为 你下载的字体库路径，注意 SourceHanSansSC-Bold.otf 字体的路径
-zhfont1 = matplotlib.font_manager.FontProperties(fname="SourceHanSansSC-Bold.otf") 
- 
-
-
-
-plt.rcParams['font.sans-serif'] = ['zhfont1']
-matplotlib.rcParams['axes.unicode_minus'] = False   # 解决负号显示问题
-
+# 设置全局字体
+plt.rcParams['font.family'] = zhfont1.get_name()  # 设置字体
+plt.rcParams['axes.unicode_minus'] = False  # 解决负号显示问题
 
 # 标题和简介
 st.title(u'热电模块性能计算-20241130-wjj')
