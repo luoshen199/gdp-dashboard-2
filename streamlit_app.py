@@ -11,6 +11,12 @@ plt.rcParams['font.sans-serif'] = ['Microsoft YaHei']  # 或其他安装的中�
 plt.rcParams['axes.unicode_minus'] = False  # 解决负号显示问题
 
 
+# 测试绘图
+plt.figure()
+plt.plot([1, 2, 3], [4, 5, 6])
+plt.title('测试中文标题')  # 这里应该能正确显示中文
+plt.show()
+
 
 
 # 标题和简介
