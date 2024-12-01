@@ -11,7 +11,7 @@ from io import BytesIO
 
 
 
- #设置字体路径
+#设置字体路径
 from matplotlib import font_manager
 font_path = 'SourceHanSansSC-Bold.otf'
 font_manager.fontManager.addfont(font_path)
@@ -25,9 +25,9 @@ plt.rcParams['axes.unicode_minus'] = False  # 解决负号显示问题
 
 
 # 设置字体为宋体
-#plt.rcParams['font.sans-serif'] = ['SimHei']
+# plt.rcParams['font.sans-serif'] = ['SimHei']
 
-#matplotlib.rcParams['axes.unicode_minus'] = False   # 解决负号显示问题
+# matplotlib.rcParams['axes.unicode_minus'] = False   # 解决负号显示问题
 
 
 # 标题和简介
@@ -513,6 +513,18 @@ with st.expander("输入导热率公式系数（拟合温度：200~600K）"):
 with st.expander("计算结果", expanded=True):
 
 
+
+
+
+
+
+
+
+
+
+
+
+
     # 计算N型材料的平均物性值
     avg_lambda_n = calculate_average_property(lambda_func, T_c, T_h, coeffs_lambda_n)
     avg_rho_n = calculate_average_property(rho_func, T_c, T_h, coeffs_rho_n)
@@ -563,35 +575,63 @@ with st.expander("计算结果", expanded=True):
 
 
 
+ 
 
 
-# 主要结果展示
 
-with st.expander("计算结果摘要",expanded=True):
-    st.write("### 计算结果摘要")
-    col1, col2, col3 = st.columns(3)
-    with col1:
-        st.metric(label="N型材料平均Seebeck系数", value=f"{avg_seebeck_n:.3e} V/K")
-        st.metric(label="P型材料平均Seebeck系数", value=f"{avg_seebeck_p:.3e} V/K")
-        st.metric(label="总平均Seebeck系数", value=f"{S_total:.3e} V/K")
-    with col2:
-        st.metric(label="N型材料平均导热率", value=f"{avg_lambda_n:.3f} Ω·m")
-        st.metric(label="P型材料平均导热率", value=f"{avg_lambda_p:.3f} Ω·m")
-        st.metric(label="总电阻", value=f"{R_total:.3e} Ω")
-    with col3:
-        st.metric(label="电流密度", value=f"{J/1000000:.3f} A/mm²")
-        st.metric(label="总电压", value=f"{U:.3f} V")
-        st.metric(label="温度区间平均ZT值", value=f"{ZT:.3f}")
 
-    # 高级电力计算展示
-    st.write("### 电力输出详情")
-    col4, col5, col6 = st.columns(3)
-    with col4:
-        st.metric(label="最大功率下的电流", value=f"{I_max_power:.3f} A")
-    with col5:    
-        st.metric(label="最大输出电功率", value=f"{P_max:.3f} W")
-    with col6:
-        st.metric(label="电流密度", value=f"{J/1000000:.3f} A/mm²")
+
+# 5. 扩展数据（动态加载更多）
+with st.expander("计算结果"):
+
+    # 标题
+    st.title("计算结果展示")
+
+    # 1. 基础物性值
+    st.subheader("基础物性值")
+    cols1 = st.columns(3)
+    cols1[0].metric(label="N型材料平均Seebeck系数", value=f"{avg_seebeck_n:.3e} V/K")
+    cols1[1].metric(label="P型材料平均Seebeck系数", value=f"{avg_seebeck_p:.3e} V/K")
+    cols1[2].metric(label="总平均Seebeck系数", value=f"{S_total:.3e} V/K")
+
+    cols2 = st.columns(2)
+    cols2[0].metric(label="N型材料平均导热率", value=f"{avg_lambda_n:.3f} W/m·K")
+    cols2[1].metric(label="P型材料平均导热率", value=f"{avg_lambda_p:.3f} W/m·K")
+
+    cols3 = st.columns(2)
+    cols3[0].metric(label="N型材料平均电阻率", value=f"{avg_rho_n:.3e} Ω·m")
+    cols3[1].metric(label="P型材料平均电阻率", value=f"{avg_rho_p:.3e} Ω·m")
+
+    st.metric(label="总电阻", value=f"{R_total:.3e} Ω")
+
+    # 2. 电性能指标
+    st.subheader("电性能指标")
+    cols4 = st.columns(3)
+    cols4[0].metric(label="温度区间平均ZT值", value=f"{ZT:.3f}")
+    cols4[1].metric(label="总电压", value=f"{U:.3f} V")
+    cols4[2].metric(label="电流密度", value=f"{J/1e6:.3f} A/mm²")
+
+    cols5 = st.columns(2)
+    cols5[0].metric(label="最大功率下的电流", value=f"{I_max_power:.3f} A")
+    cols5[1].metric(label="最大输出电功率", value=f"{P_max:.3f} W")
+
+    # 3. 热流计算
+    st.subheader("最大功率下的热流")
+    st.latex(r'''
+    Q_h = \alpha_{\text{总}} \cdot T_c \cdot I + K(T_h - T_c) + \frac{1}{2} I^2 R
+    ''')
+
+    cols6 = st.columns(4)
+    cols6[0].metric(label="Seebeck效应产生的热", value=f"{Q_Seebeck:.3f} W")
+    cols6[1].metric(label="热导损失的热流", value=f"{Q_conductive:.3f} W")
+    cols6[2].metric(label="焦耳热产生的热", value=f"{Q_joule:.3f} W")
+    cols6[3].metric(label="总热流", value=f"{Q_h:.3f} W")
+
+    # 4. 转换效率
+    st.subheader("最大功率转换效率")
+    st.metric(label="效率", value=f"{eta * 100:.3f}%")
+
+
 
 # 增加电池个数的展示
 with st.expander("增加电池个数"):
@@ -604,23 +644,23 @@ with st.expander("增加电池个数"):
     st.write("### 计算影响")
     col1, col2, col3, col4 = st.columns(4)
     with col1:
-        st.metric(label=f"{SN}个串联电池总电阻", value=f"{SN*R_total:.3f} Ω")
+        st.metric(label=f"{SN}个串联电池总电阻", value=f"{SN*1000*R_total:.2f} mmΩ")
     with col2:
         st.metric(label=f"{SN}个串联电池总电压", value=f"{SN*U:.3f} V")
     with col3:
-        st.metric(label=f"{SN}个串联电池最大功率下的电流", value=f"{I_max_power:.3f} A")
+        st.metric(label=f"{SN}个串联电池最大功率下的电流", value=f"{I_max_power:.1f} A")
     with col4:
-        st.metric(label=f"{SN}个串联电池最大输出电功率", value=f"{P_max_n:.3f} W")
+        st.metric(label=f"{SN}个串联电池最大输出电功率", value=f"{P_max_n:.1f} W")
     st.write("### 热流分析")
     col5, col6, col7, col8 = st.columns(4)
     with col5:
-        st.metric(label="Seebeck效应热", value=f"{Q_Seebeck:.3f} W")
+        st.metric(label="Seebeck效应热", value=f"{Q_Seebeck:.1f} W")
     with col6:
-        st.metric(label="热导损失热流", value=f"{Q_conductive:.3f} W")
+        st.metric(label="热导损失热流", value=f"{Q_conductive:.1f} W")
     with col7:
         st.metric(label="焦耳热产生的热", value=f"{Q_joule_n:.3f} W")
     with col8:
-        st.metric(label=f"{SN}个电池的总热流", value=f"{Q_h_n:.3f} W")
+        st.metric(label=f"{SN}个电池的总热流", value=f"{Q_h_n:.1f} W")
 
 # 变温度计算
 # 变温度计算
@@ -734,8 +774,8 @@ with st.expander("温度曲线图"):
         Q_joule_values.append(Q_joule)
 
         # 计算效率
-        eta = calculate_efficiency(P_max, Q_h)
-        efficiency_values.append(eta)
+        eta2 = calculate_efficiency(P_max, Q_h)
+        efficiency_values.append(eta2)
 
         
 
@@ -816,12 +856,9 @@ with st.expander("温度曲线图"):
     ax.plot(T_range, efficiency_values, label='最大效率 η', color='red')  # 使用普通文本而不是LaTeX
     ax.set_xlabel(u'温度 (K)')
     ax.set_ylabel(u'效率')
-    ax.set_title('最大效率随温度变化')
+    ax.set_title('温度区间的最大效率')
     ax.legend()
     st.pyplot(fig)
-
-
-
 
 
 
