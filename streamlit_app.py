@@ -4,29 +4,17 @@ import matplotlib
 import streamlit as st
 from scipy.integrate import quad
 
-
-from matplotlib import font_manager
-
 # 设置字体路径
+from matplotlib import font_manager
 font_path = 'SourceHanSansSC-Bold.otf'
 font_manager.fontManager.addfont(font_path)
 plt.rcParams['font.family'] = font_manager.FontProperties(fname=font_path).get_name()
 plt.rcParams['axes.unicode_minus'] = False  # 解决负号显示问题
 
-# 测试绘图
-import numpy as np
-x = np.arange(1, 11)
-y = 2 * x + 5
-plt.title("菜鸟教程 - 测试")
-plt.xlabel("x 轴")
-plt.ylabel("y 轴")
-plt.plot(x, y)
-plt.show()
-
 
 
 # 标题和简介
-st.title(u'热电模块性能计算-20241130-wjj')
+st.title('热电模块性能计算-20241130-wjj')
 st.write('这个应用程序允许用户输入温差电池的尺寸、温度以及物料属性，计算和展示热电模块的性能参数。')
 
 # 显示公式
@@ -213,8 +201,7 @@ coeffs_seebeck_n = (-1.045e-11, 9.337e-9, -2.649e-6, 4.4603e-4)
 coeffs_seebeck_p = (-6.373e-12, 3.59e-9, -9.24e-8, 8.4605e-5)
 
 
-# 定义温度范围
-T_range = np.linspace(200, 600, 300)
+
 
 # 初始化公式参数
 a_n, b_n, c_n, d_n = -1.045e-11, 9.337e-9, -2.649e-6, 4.4603e-4
@@ -229,20 +216,23 @@ lambda_a_p, lambda_b_p, lambda_c_p, lambda_d_p = 0, 3.2e-5, - 0.0216, 4.949
 with st.expander("输入温度参数", expanded=True):
     col1, col2 = st.columns(2)
 with col1:
-    T_h = st.number_input('热端温度 (K)', value=373.0, format="%f")
+    T_c = st.number_input('冷端温度 (K)', value=320.0,min_value=200.0, max_value=600.0, step=1.0, help="请输入冷端温度", format="%f")
 with col2:
-    T_c = st.number_input('冷端温度 (K)', value=273.0, format="%f")
+    T_h = st.number_input('热端温度 (K)', value=450.0,min_value=200.0, max_value=600.0, step=1.0, help="请输入热端温度", format="%f")
     T_avg = (T_h + T_c) / 2
+
+    # 定义温度范围``
+T_range = np.linspace(T_c, T_h, 300)
 
 # 用户输入材料尺寸
 with st.expander("输入材料尺寸"):
         col1, col2, col3 = st.columns(3)
 with col1:
-    L = st.number_input('长度 (m)', value=0.01, format="%f")
+    L = st.number_input('长度 (m)', value=0.01,min_value=0.0, max_value=100000.0, step=0.001, format="%f")
 with col2:
-    W = st.number_input('宽度 (m)', value=0.01, format="%f")
+    W = st.number_input('宽度 (m)', value=0.01,min_value=0.0, max_value=100000.0, step=0.001,  format="%f")
 with col3:
-    H = st.number_input('P/N高度 (m)', value=0.002, format="%f")
+    H = st.number_input('P/N高度 (m)', value=0.002,min_value=0.0, max_value=100000.0, step=0.001,  format="%f")
     A = W * L  # 计算截面积
 
 # 用户输入公式系数
@@ -250,22 +240,28 @@ with col3:
 
 # 自定义Seebeck系数公式
 
-with st.expander("输入Seebeck系数公式参数"):
+with st.expander("输入Seebeck系数公式参数（拟合温度：200~600K）"):
     st.write("#### N型材料Seebeck系数公式系数")
 
     st.latex(r'''
     a_n = -1.045 \times 10^{-11} T^3 + 9.337 \times 10^{-9} T^2 - 2.649 \times 10^{-6} T + 4.4603 \times 10^{-4}
     ''')
 
+    def calculate_step(value):
+        # 保证步长为浮点类型，并且是value的10%
+        return abs(float(value)) * 0.1 if value != 0 else 0.1
+
     col1, col2, col3, col4 = st.columns(4)
+
     with col1:
-        a_n = st.number_input('a_n', value=a_n, format="%e")
+        a_n = st.number_input('a_n', value=float(a_n), step=calculate_step(a_n), format="%e", min_value=float(-1e10), max_value=float(1e10))
     with col2:
-        b_n = st.number_input('b_n', value=b_n, format="%e")
+        b_n = st.number_input('b_n', value=float(b_n), step=calculate_step(b_n), format="%e", min_value=float(-1e10), max_value=float(1e10))
     with col3:
-        c_n = st.number_input('c_n', value=c_n, format="%e")
+        c_n = st.number_input('c_n', value=float(c_n), step=calculate_step(c_n), format="%e", min_value=float(-1e10), max_value=float(1e10))
     with col4:
-        d_n = st.number_input('d_n', value=d_n, format="%e")
+        d_n = st.number_input('d_n', value=float(d_n), step=calculate_step(d_n), format="%e", min_value=float(-1e10), max_value=float(1e10))
+
 
     st.write("#### P型材料Seebeck系数公式系数")
     st.latex(r'''
@@ -292,7 +288,7 @@ with st.expander("输入Seebeck系数公式参数"):
     ax.plot(T_range, alpha_p_values, label=r'P型 α', color='red')
     ax.set_xlabel(u'温度 (K)')
     ax.set_ylabel(u'Seebeck 系数 (V/K)')
-    ax.set_title(u'Seebeck 系数随温度变化')
+    ax.set_title('Seebeck 系数随温度变化')
     ax.legend()
     st.pyplot(fig)
 
@@ -301,7 +297,7 @@ with st.expander("输入Seebeck系数公式参数"):
 
 
 # 自定义电阻率公式
-with st.expander("输入电阻率公式系数（可选）"):
+with st.expander("输入电阻率公式系数（拟合温度：200~600K）"):
     st.write("#### N型材料电阻率公式系数")
     
     st.latex(r'''
@@ -341,12 +337,12 @@ with st.expander("输入电阻率公式系数（可选）"):
     ax.plot(T_range, rho_p_values, label=r'P型 ρ', color='brown')
     ax.set_xlabel(u'温度 (K)')
     ax.set_ylabel(u'电阻率 (Ω·m)')
-    ax.set_title(u'电阻率随温度变化')
+    ax.set_title('电阻率随温度变化')
     ax.legend()
     st.pyplot(fig)
 
 # 自定义导热率公式
-with st.expander("输入导热率公式系数（可选）"):
+with st.expander("输入导热率公式系数（拟合温度：200~600K）"):
     st.write("#### N型材料导热率公式系数")
     st.latex(r'''
     \lambda_n = 2.36 \times 10^{-5} T^2 - 0.015 T + 3.806
@@ -384,7 +380,7 @@ with st.expander("输入导热率公式系数（可选）"):
     ax.plot(T_range, lambda_p_values, label=r'P型 λ', color='purple')
     ax.set_xlabel(u'温度 (K)')
     ax.set_ylabel(u'热导率 (W/m·K)')
-    ax.set_title(u'热导率随温度变化')
+    ax.set_title('热导率随温度变化')
     ax.legend()
     st.pyplot(fig)
 
@@ -542,7 +538,7 @@ with st.expander("温度曲线图"):
     ax.plot(T_range, ZT_values, label=r'ZT（P和N）', color='green')
     ax.set_xlabel(u'温度 (K)')
     ax.set_ylabel(u'ZT 值')
-    ax.set_title(u'ZT 随温度变化')
+    ax.set_title('ZT 随温度变化')
     ax.legend()
     st.pyplot(fig)
 
@@ -637,7 +633,7 @@ with st.expander("温度曲线图"):
     ax.plot(T_range, voltage_values, label='电压 U', color='purple')
     ax.set_xlabel(u'温度 (K)')
     ax.set_ylabel(u'电压 (V)')
-    ax.set_title(u'电压随温度变化')
+    ax.set_title('电压随温度变化')
     ax.legend()
     st.pyplot(fig)
 
@@ -661,7 +657,7 @@ with st.expander("温度曲线图"):
     ax.plot(T_range, P_max_values, label='最大功率 P', color='blue')  # 使用普通文本而不是LaTeX
     ax.set_xlabel(u'温度 (K)')
     ax.set_ylabel(u'最大功率 (W)')
-    ax.set_title(u'最大功率随温度变化')
+    ax.set_title('最大功率随温度变化')
     ax.legend()
     st.pyplot(fig)
 
@@ -675,7 +671,7 @@ with st.expander("温度曲线图"):
     ax.plot(T_range, Q_joule_values, label='焦耳热流 Qjoule', color='brown')  # 使用普通文本
     ax.set_xlabel(u'温度 (K)')
     ax.set_ylabel(u'热流 (W)')
-    ax.set_title(u'不同热流随温度变化')
+    ax.set_title('不同热流随温度变化')
     ax.legend()
     st.pyplot(fig)
 
@@ -685,19 +681,9 @@ with st.expander("温度曲线图"):
     ax.plot(T_range, efficiency_values, label='最大效率 η', color='red')  # 使用普通文本而不是LaTeX
     ax.set_xlabel(u'温度 (K)')
     ax.set_ylabel(u'效率')
-    ax.set_title(u'最大效率随温度变化')
+    ax.set_title('最大效率随温度变化')
     ax.legend()
     st.pyplot(fig)
-
-
-
-
-
-
-
-
-
-
 
 
 
