@@ -11,12 +11,12 @@ from io import BytesIO
 
 
 
-# #设置字体路径
-# from matplotlib import font_manager
-# font_path = 'SourceHanSansSC-Bold.otf'
-# font_manager.fontManager.addfont(font_path)
-# plt.rcParams['font.family'] = font_manager.FontProperties(fname=font_path).get_name()
-# plt.rcParams['axes.unicode_minus'] = False  # 解决负号显示问题
+ #设置字体路径
+from matplotlib import font_manager
+font_path = 'SourceHanSansSC-Bold.otf'
+font_manager.fontManager.addfont(font_path)
+plt.rcParams['font.family'] = font_manager.FontProperties(fname=font_path).get_name()
+plt.rcParams['axes.unicode_minus'] = False  # 解决负号显示问题
 
 
 
@@ -25,9 +25,9 @@ from io import BytesIO
 
 
 # 设置字体为宋体
-plt.rcParams['font.sans-serif'] = ['SimHei']
+#plt.rcParams['font.sans-serif'] = ['SimHei']
 
-matplotlib.rcParams['axes.unicode_minus'] = False   # 解决负号显示问题
+#matplotlib.rcParams['axes.unicode_minus'] = False   # 解决负号显示问题
 
 
 # 标题和简介
