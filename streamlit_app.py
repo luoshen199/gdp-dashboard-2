@@ -4,19 +4,19 @@ import matplotlib
 import streamlit as st
 from scipy.integrate import quad
 
+import pandas as pd
+from io import BytesIO
 
 
 
 
 
-
-
-#设置字体路径
-from matplotlib import font_manager
-font_path = 'SourceHanSansSC-Bold.otf'
-font_manager.fontManager.addfont(font_path)
-plt.rcParams['font.family'] = font_manager.FontProperties(fname=font_path).get_name()
-plt.rcParams['axes.unicode_minus'] = False  # 解决负号显示问题
+# #设置字体路径
+# from matplotlib import font_manager
+# font_path = 'SourceHanSansSC-Bold.otf'
+# font_manager.fontManager.addfont(font_path)
+# plt.rcParams['font.family'] = font_manager.FontProperties(fname=font_path).get_name()
+# plt.rcParams['axes.unicode_minus'] = False  # 解决负号显示问题
 
 
 
@@ -25,9 +25,9 @@ plt.rcParams['axes.unicode_minus'] = False  # 解决负号显示问题
 
 
 # 设置字体为宋体
-#plt.rcParams['font.sans-serif'] = ['SimHei']
+plt.rcParams['font.sans-serif'] = ['SimHei']
 
-#matplotlib.rcParams['axes.unicode_minus'] = False   # 解决负号显示问题
+matplotlib.rcParams['axes.unicode_minus'] = False   # 解决负号显示问题
 
 
 # 标题和简介
@@ -224,23 +224,37 @@ def calculate_average_property(func, T_c, T_h, coeffs):
 
 
 # N型和P型材料的物性参数系数
+#coeffs_seebeck_n = (-1.045e-11, 9.337e-9, -2.649e-6, 4.4603e-4)
+#coeffs_seebeck_p = (-6.373e-12, 3.59e-9, -9.24e-8, 8.4605e-5)
+coeffs_seebeck_n = (1.82981e-12, -3.17605e-09, 1.33474e-06, 5.30108e-05)
+coeffs_seebeck_p = (2.11554e-12, -3.62723e-09, 1.54490e-06, 2.09893e-05)
+
+
+
 coeffs_lambda_n = (0, 2.36e-5, -0.015, 3.806)
 coeffs_lambda_p = (0, 3.2e-5, -0.0216, 4.949)
-coeffs_rho_n = (-2.5786e-13, 1.9767e-10, -6.0208e-9, 5.7588e-7)
-coeffs_rho_p = (-7.9299e-13, 8.6932e-10, -2.506e-7, 2.8215e-5)
-coeffs_seebeck_n = (-1.045e-11, 9.337e-9, -2.649e-6, 4.4603e-4)
-coeffs_seebeck_p = (-6.373e-12, 3.59e-9, -9.24e-8, 8.4605e-5)
+
+#coeffs_rho_n = (-2.5786e-13, 1.9767e-10, -6.0208e-9, 5.7588e-7)
+#coeffs_rho_p = (-7.9299e-13, 8.6932e-10, -2.506e-7, 2.8215e-5)
+coeffs_rho_n = (8.4476e-14, -1.7758e-10, 1.2524e-07, -1.4166e-05)
+coeffs_rho_p = (7.7187e-14, -1.8061e-10, 1.4092e-07, -1.7761e-05)
 
 
 
 
 # 初始化公式参数
-a_n, b_n, c_n, d_n = -1.045e-11, 9.337e-9, -2.649e-6, 4.4603e-4
-a_p, b_p, c_p, d_p = -6.373e-12, 3.59e-9, -9.24e-8, 8.4605e-5
-rho_a_n, rho_b_n, rho_c_n, rho_d_n = -2.5786e-13, 1.9767e-10, -6.0208e-9, 5.7588e-7
-rho_a_p, rho_b_p, rho_c_p, rho_d_p = -7.9299e-13, 8.6932e-10, -2.506e-7, 2.8215e-5
+#a_n, b_n, c_n, d_n = -1.045e-11, 9.337e-9, -2.649e-6, 4.4603e-4
+#a_p, b_p, c_p, d_p = -6.373e-12, 3.59e-9, -9.24e-8, 8.4605e-5
+a_n, b_n, c_n, d_n = 1.82981e-12, -3.17605e-09, 1.33474e-06, 5.30108e-05
+a_p, b_p, c_p, d_p = 2.11554e-12, -3.62723e-09, 1.54490e-06, 2.09893e-05
 lambda_a_n, lambda_b_n, lambda_c_n, lambda_d_n = 0, 2.36e-5, - 0.015, 3.806
 lambda_a_p, lambda_b_p, lambda_c_p, lambda_d_p = 0, 3.2e-5, - 0.0216, 4.949
+
+#rho_a_n, rho_b_n, rho_c_n, rho_d_n = -2.5786e-13, 1.9767e-10, -6.0208e-9, 5.7588e-7
+#rho_a_p, rho_b_p, rho_c_p, rho_d_p = -7.9299e-13, 8.6932e-10, -2.506e-7, 2.8215e-5
+rho_a_n, rho_b_n, rho_c_n, rho_d_n = 8.4476e-14, -1.7758e-10, 1.2524e-07, -1.4166e-05
+rho_a_p, rho_b_p, rho_c_p, rho_d_p = 7.7187e-14, -1.8061e-10, 1.4092e-07, -1.7761e-05
+
 
 # 用户输入温度
 
@@ -249,11 +263,11 @@ with st.expander("输入温度参数", expanded=True):
 with col1:
     T_c = st.number_input('冷端温度 (K)', value=320.0,min_value=200.0, max_value=600.0, step=1.0, help="请输入冷端温度", format="%f")
 with col2:
-    T_h = st.number_input('热端温度 (K)', value=450.0,min_value=200.0, max_value=600.0, step=1.0, help="请输入热端温度", format="%f")
+    T_h = st.number_input('热端温度 (K)', value=450.0,min_value=200.0, max_value=800.0, step=1.0, help="请输入热端温度", format="%f")
     T_avg = (T_h + T_c) / 2
 
     # 定义温度范围``
-T_range = np.linspace(T_c, T_h, 300)
+T_range = np.linspace(T_c, T_h, 30)
 
 # 用户输入材料尺寸
 with st.expander("输入材料尺寸"):
@@ -272,7 +286,8 @@ with col3:
 # 自定义Seebeck系数公式
 
 with st.expander("输入Seebeck系数公式参数（拟合温度：200~600K）"):
-    st.write("#### N型材料Seebeck系数公式系数")
+    st.write("#### N型材料Seebeck系数公式系数")    
+    st.markdown("多项式拟合：[拟合](https://demo2.yunser.com/math/fitted_curve/)") 
 
     st.latex(r'''
     a_n = -1.045 \times 10^{-11} T^3 + 9.337 \times 10^{-9} T^2 - 2.649 \times 10^{-6} T + 4.4603 \times 10^{-4}
@@ -314,6 +329,17 @@ with st.expander("输入Seebeck系数公式参数（拟合温度：200~600K）")
     alpha_p_values = calculate_coefficient(T_range, a_p, b_p, c_p, d_p)
 
 # 输出Seebeck数据图表
+
+
+        # 假设 T_range, alpha_n_values, alpha_p_values 是已经定义好的数据列表
+        # 创建 DataFrame
+    data = pd.DataFrame({
+        '温度 (K)': T_range,
+        'N型 α (V/K)': alpha_n_values,
+        'P型 α (V/K)': alpha_p_values
+    })
+
+    # 创建图表
     fig, ax = plt.subplots(figsize=(8, 6))
     ax.plot(T_range, alpha_n_values, label=r'N型 α', color='blue')
     ax.plot(T_range, alpha_p_values, label=r'P型 α', color='red')
@@ -323,7 +349,21 @@ with st.expander("输入Seebeck系数公式参数（拟合温度：200~600K）")
     ax.legend()
     st.pyplot(fig)
 
+    # 将 DataFrame 转换为 CSV 并创建下载链接
+    def convert_df_to_csv(df):
+        output = BytesIO()
+        df.to_csv(output, index=False, encoding='utf-8-sig')  # 使用utf-8-sig ，确保index=False除非你想要行号编码
+        output.seek(0)
+        return output
 
+    csv = convert_df_to_csv(data)
+
+    st.download_button(
+        label="下载 Seebeck 数据",
+        data=csv,
+        file_name='seebeck_data.csv',
+        mime='text/csv',
+    )
 
 
 
@@ -362,7 +402,9 @@ with st.expander("输入电阻率公式系数（拟合温度：200~600K）"):
 # 计算电阻率数据
     rho_n_values = calculate_coefficient(T_range, rho_a_n, rho_b_n, rho_c_n, rho_d_n)
     rho_p_values = calculate_coefficient(T_range, rho_a_p, rho_b_p, rho_c_p, rho_d_p)
+
 # 输出电阻率数据图表
+    # 电阻率数据图表
     fig, ax = plt.subplots(figsize=(8, 6))
     ax.plot(T_range, rho_n_values, label=r'N型 ρ', color='orange')
     ax.plot(T_range, rho_p_values, label=r'P型 ρ', color='brown')
@@ -371,6 +413,31 @@ with st.expander("输入电阻率公式系数（拟合温度：200~600K）"):
     ax.set_title('电阻率随温度变化')
     ax.legend()
     st.pyplot(fig)
+
+    # 将电阻率数据转换为 DataFrame
+    data_resistivity = pd.DataFrame({
+        '温度 (K)': T_range,
+        'N型 ρ (Ω·m)': rho_n_values,
+        'P型 ρ (Ω·m)': rho_p_values
+    })
+
+    # 转换 DataFrame 为 CSV
+    def convert_df_to_csv(df):
+        output = BytesIO()
+        df.to_csv(output, index=False, encoding='utf-8-sig')  # 确保 UTF-8 编码解决中文问题
+        output.seek(0)
+        return output
+
+    csv_resistivity = convert_df_to_csv(data_resistivity)
+
+    # 添加下载按钮
+    st.download_button(
+        label="下载电阻率数据",
+        data=csv_resistivity,
+        file_name='resistivity_data.csv',
+        mime='text/csv',
+    )
+
 
 # 自定义导热率公式
 with st.expander("输入导热率公式系数（拟合温度：200~600K）"):
@@ -406,6 +473,7 @@ with st.expander("输入导热率公式系数（拟合温度：200~600K）"):
     lambda_n_values = calculate_coefficient(T_range, lambda_a_n, lambda_b_n, lambda_c_n, lambda_d_n)
     lambda_p_values = calculate_coefficient(T_range, lambda_a_p, lambda_b_p, lambda_c_p, lambda_d_p)
 # 输出导热率数据图表
+    # 输出导热率数据图表
     fig, ax = plt.subplots(figsize=(8, 6))
     ax.plot(T_range, lambda_n_values, label=r'N型 λ', color='green')
     ax.plot(T_range, lambda_p_values, label=r'P型 λ', color='purple')
@@ -414,6 +482,31 @@ with st.expander("输入导热率公式系数（拟合温度：200~600K）"):
     ax.set_title('热导率随温度变化')
     ax.legend()
     st.pyplot(fig)
+
+    # 将导热率数据转换为 DataFrame
+    data_conductivity = pd.DataFrame({
+        '温度 (K)': T_range,
+        'N型 λ (W/m·K)': lambda_n_values,
+        'P型 λ (W/m·K)': lambda_p_values
+    })
+
+    # 转换 DataFrame 为 CSV
+    def convert_df_to_csv(df):
+        output = BytesIO()
+        df.to_csv(output, index=False, encoding='utf-8-sig')  # 确保 UTF-8 编码解决中文问题
+        output.seek(0)
+        return output
+
+    csv_conductivity = convert_df_to_csv(data_conductivity)
+
+    # 添加下载按钮
+    st.download_button(
+        label="下载热导率数据",
+        data=csv_conductivity,
+        file_name='conductivity_data.csv',
+        mime='text/csv',
+    )
+
 
 
 # 显示计算结果
