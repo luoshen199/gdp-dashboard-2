@@ -4,7 +4,14 @@ import matplotlib
 import streamlit as st
 from scipy.integrate import quad
 
-# 设置字体路径
+
+
+
+
+
+
+
+#设置字体路径
 from matplotlib import font_manager
 font_path = 'SourceHanSansSC-Bold.otf'
 font_manager.fontManager.addfont(font_path)
@@ -13,163 +20,187 @@ plt.rcParams['axes.unicode_minus'] = False  # 解决负号显示问题
 
 
 
+
+
+
+
+# 设置字体为宋体
+#plt.rcParams['font.sans-serif'] = ['SimHei']
+
+#matplotlib.rcParams['axes.unicode_minus'] = False   # 解决负号显示问题
+
+
 # 标题和简介
 st.title('热电模块性能计算-20241130-wjj')
 st.write('这个应用程序允许用户输入温差电池的尺寸、温度以及物料属性，计算和展示热电模块的性能参数。')
 
 # 显示公式
-st.write("""## 参考公式""")
 
-# Seebeck系数 (α)
-st.write("### Seebeck系数 (α)")
-st.latex(r'''
-a_n = -1.045 \times 10^{-11} T^3 + 9.337 \times 10^{-9} T^2 - 2.649 \times 10^{-6} T + 4.4603 \times 10^{-4}
-''')
-st.latex(r'''
-a_p = -6.373 \times 10^{-12} T^3 + 3.59 \times 10^{-9} T^2 - 9.24 \times 10^{-8} T + 8.4605 \times 10^{-5}
-''')
+with st.expander("参考公式"):
+    # Seebeck系数 (α)
+    st.write("### Seebeck系数 (α)")
+    st.latex(r'''
+    a_n = -1.045 \times 10^{-11} T^3 + 9.337 \times 10^{-9} T^2 - 2.649 \times 10^{-6} T + 4.4603 \times 10^{-4}
+    ''')
+    st.latex(r'''
+    a_p = -6.373 \times 10^{-12} T^3 + 3.59 \times 10^{-9} T^2 - 9.24 \times 10^{-8} T + 8.4605 \times 10^{-5}
+    ''')
 
-# 电动势公式
-st.write("### 电动势公式")
-st.write("热电模块两端的电动势由 Seebeck 效应产生，其计算公式为：")
-st.latex(r'''
-\mathcal{E} = S \cdot \Delta T
-''')
-st.write("其中：")
-st.latex(r'''
-\mathcal{E} \text{ ：是一对P、N温差电池的电动势，单位为伏特 (V)；}
-''')
-st.latex(r'''
-S \text{ ：是总 Seebeck 系数，单位为伏特每开尔文 (V/K)；}
-''')
-st.latex(r'''
-\Delta T \text{ ：是温差，单位为开尔文 (K)，计算为 } T_{\text{热端}} - T_{\text{冷端}}。
-''')
-st.write("""
-当 \( S \) 随温度变化时，电动势可用积分形式计算：
-""")
-st.latex(r'''
-\mathcal{E} = \int_{T_{\text{冷端}}}^{T_{\text{热端}}} S(T) \, dT
-''')
-st.write("""
-上述公式是更精确的计算方法，适用于复杂材料的性能评估。
-""")
-
-
-# 热导率 (λ)
-st.write("### 热导率 (λ)")
-st.latex(r'''
-\lambda_n = 2.36 \times 10^{-5} T^2 - 0.015 T + 3.806
-''')
-st.latex(r'''
-\lambda_p = 3.2 \times 10^{-5} T^2 - 0.0216 T + 4.949
-''')
-
-# 电阻率 (ρ)
-st.write("### 电阻率 (ρ)")
-st.latex(r'''
-\rho_n = -2.5786 \times 10^{-13} T^3 + 1.9767 \times 10^{-10} T^2 - 6.0208 \times 10^{-9} T + 5.7588 \times 10^{-7}
-''')
-st.latex(r'''
-\rho_p = -7.9299 \times 10^{-13} T^3 + 8.6932 \times 10^{-10} T^2 - 2.506 \times 10^{-7} T + 2.8215 \times 10^{-5}
-''')
-
-# ZT值公式
-st.write("### ZT值公式")
-st.latex(r'''
-ZT = \frac{S^2 \cdot T}{\lambda \cdot \rho}
-''')
-st.write("""
+    # 电动势公式
+    st.write("### 电动势公式")
+    st.write("热电模块两端的电动势由 Seebeck 效应产生，其计算公式为：")
+    st.latex(r'''
+    \mathcal{E} = S \cdot \Delta T
+    ''')
+    st.write("其中：")
+    st.latex(r'''
+    \mathcal{E} \text{ ：是一对P、N温差电池的电动势，单位为伏特 (V)；}
+    ''')
+    st.latex(r'''
+    S \text{ ：是总 Seebeck 系数，单位为伏特每开尔文 (V/K)；}
+    ''')
+    st.latex(r'''
+    \Delta T \text{ ：是温差，单位为开尔文 (K)，计算为 } T_{\text{热端}} - T_{\text{冷端}}。
+    ''')
+    st.write("""
+    当 \( S \) 随温度变化时，电动势可用积分形式计算：
+    """)
+    st.latex(r'''
+    \mathcal{E} = \int_{T_{\text{冷端}}}^{T_{\text{热端}}} S(T) \, dT
+    ''')
+    st.write("""
+    上述公式是更精确的计算方法，适用于复杂材料的性能评估。
+    """)
 
 
-**物理模型简化**：
-通常在设计制造温差发电片时，P、N 电偶臂的高度一致，适当的 P、N 电偶臂截面面积比有利于提高 ZT值，即提高温差发电片整体性能。进一步假定 P、N 型电偶臂材料的热导率、电阻率相同,塞贝克系数的数值相等但是符号相反,最终简化为该方程
+    # 热导率 (λ)
+    st.write("### 热导率 (λ)")
+    st.latex(r'''
+    \lambda_n = 2.36 \times 10^{-5} T^2 - 0.015 T + 3.806
+    ''')
+    st.latex(r'''
+    \lambda_p = 3.2 \times 10^{-5} T^2 - 0.0216 T + 4.949
+    ''')
 
-其中：
-- \( S \) 为 Seebeck 系数；
-- \( T \) 为平均温度（当 ( S ) 随温度T变化时，ZT值可用积分形式计算）；
-- \( λ \) 为材料的热导率；
-- \( ρ \) 材料的电阻率。
+    # 电阻率 (ρ)
+    st.write("### 电阻率 (ρ)")
+    st.latex(r'''
+    \rho_n = -2.5786 \times 10^{-13} T^3 + 1.9767 \times 10^{-10} T^2 - 6.0208 \times 10^{-9} T + 5.7588 \times 10^{-7}
+    ''')
+    st.latex(r'''
+    \rho_p = -7.9299 \times 10^{-13} T^3 + 8.6932 \times 10^{-10} T^2 - 2.506 \times 10^{-7} T + 2.8215 \times 10^{-5}
+    ''')
 
-**ZT值的物理意义**：
-ZT 值越高，说明材料的热电转换效率越高，能更有效地将热能转化为电能。
-)
-
-其中：
-
-**普通材料**:ZT <1，效率较低，难以实际应用
-         
-**高性能材料**:ZT≈2-3，适合用于热电发电或制冷设备
-         
-**未来目标**:T>3，研究重点，用于高效能源转换
-
-""")
-
-# 功率公式
-st.write("### 功率公式")
-st.write("发电功率 \( P \) 的计算公式如下：")
-st.latex(r'''
-P = \frac{(S \cdot \Delta T)^2}{R}
-''')
-st.write("""
-其中：
-- \( S \) 为 Seebeck 系数；
-- \( △T \) 为温差（热端温度与冷端温度之差）；
-- \( R \) 为总电阻。
-
-**功率公式的物理意义**：用于计算热电模块的发电输出功率，结果以瓦特 (W) 为单位。
-
-### 最大发电功率
-最大发电功率 \( Pmax\) 出现在负载电阻 \( R负载 \) 等于内部电阻 \( R \) 时。其计算公式为：
-""")
-st.latex(r'''
-P_{max} = \frac{(S \cdot \Delta T)^2}{4R}
-''')
-st.write("""
-在最大功率条件下：
-- 负载电阻 \( R负载 \) 应设置为与热电模块的内部电阻 \( R \) 相同。
-
-**最大功率的物理意义**：在阻抗匹配的条件下，热电模块可以达到最高的能量转换效率，此时的功率输出是理论上的最大值。这种设置在设计热电发电系统时至关重要，以确保最高的能效。
-""")
+    # ZT值公式
+    st.write("### ZT值公式")
+    st.latex(r'''
+    ZT = \frac{S^2 \cdot T}{\lambda \cdot \rho}
+    ''')
+    st.write("""
 
 
-st.write("""
-### 最大功率电流
-最大电流I发生在负载电阻等于内部电阻。此时，电流的计算公式为：
-""")
-st.latex(r'''
-I_{\text{Pmax}} = \frac{S \cdot \Delta T}{2}
-''')
-st.write("""
-**最大电流的物理意义**：最大电流表示热电模块在短路条件下能产生的最大电流值，这对于理解和测试模块的电气特性非常重要。
+    **物理模型简化**：
+    通常在设计制造温差发电片时，P、N 电偶臂的高度一致，适当的 P、N 电偶臂截面面积比有利于提高 ZT值，即提高温差发电片整体性能。进一步假定 P、N 型电偶臂材料的热导率、电阻率相同,塞贝克系数的数值相等但是符号相反,最终简化为该方程
 
-### 热端热流 \( Qh \)
-热端热流 \( Qh \) 是指从热源通过热电模块到冷端的热能传递。其计算公式依赖于多个因素，包括热电模块的热电性能参数和温差：
-""")
-st.latex(r'''
-Q_h = \alpha_{\text{总}} \cdot T_c \cdot I + K(T_h - T_c) + \frac{1}{2} I^2 R
-''')
-st.write("""
-其中
-- \( K \) 为热电模块的热导率。
-- \( α总 \) 为N和P的温度区间平均Seebeck系数。
+    其中：
+    - \( S \) 为 Seebeck 系数；
+    - \( T \) 为平均温度（当 ( S ) 随温度T变化时，ZT值可用积分形式计算）；
+    - \( λ \) 为材料的热导率；
+    - \( ρ \) 材料的电阻率。
 
-**热流的物理意义**：热端热流量是评估热电模块热效率的关键参数，表明了热能从热源到冷端的流动效率。
+    **ZT值的物理意义**：
+    ZT 值越高，说明材料的热电转换效率越高，能更有效地将热能转化为电能。
+    )
 
-### 转换效率 \( η \)
-转换效率 \( η \) 表示热能转换为电能的效率，计算公式为：
-""")
-st.latex(r'''
-\eta = \frac{P_{\text{out}}}{Q_h}
-''')
-st.write("""
-**转换效率的物理意义**：转换效率是衡量热电模块性能的核心指标，高效率意味着更多的热能被有效转换为电能。
-""")
+    其中：
+
+    **普通材料**:ZT <1，效率较低，难以实际应用
+            
+    **高性能材料**:ZT≈2-3，适合用于热电发电或制冷设备
+            
+    **未来目标**:T>3，研究重点，用于高效能源转换
+
+    """)
+
+    # 功率公式
+    st.write("### 功率公式")
+    st.write("发电功率 \( P \) 的计算公式如下：")
+    st.latex(r'''
+    P = \frac{(S \cdot \Delta T)^2}{R}
+    ''')
+    st.write("""
+    其中：
+    - \( S \) 为 Seebeck 系数；
+    - \( Δ T \) 为温差（热端温度与冷端温度之差）；
+    - \( R \) 为总电阻，其计算如下：
+    """)
+    st.latex(r'''
+    R = \frac{\rho \cdot L}{A}
+    ''')
+    st.write("""
+    将 \( R \) 的表达式代入功率公式中，可以得到：
+    """)
+    st.latex(r'''
+    P = \frac{(S \cdot \Delta T)^2 \cdot A}{\rho \cdot L}
+    ''')
+    st.write("""
+    这个展开形式揭示了热电发电功率 \( P \) 不仅取决于塞贝克系数 \( S \) 和温差 \( Δ T \)，还受到热电材料的电阻率 \( ρ \)，电流路径的长度 \( L \) 和横截面积 \( A \) 的影响。通过调整这些几何和物理参数，可以优化装置的功率输出。
+
+    **功率公式的物理意义**：用于计算热电模块的发电输出功率，结果以瓦特 (W) 为单位。这表明通过适当选择材料和设计几何尺寸，可以优化热电装置的功率输出，进而提高能量转换的效率。
+
+
+
+    ### 最大发电功率
+    最大发电功率 \( Pmax\) 出现在负载电阻 \( R负载 \) 等于内部电阻 \( R \) 时。其计算公式为：
+    """)
+    st.latex(r'''
+    P_{max} = \frac{(S \cdot \Delta T)^2}{4R}
+    ''')
+    st.write("""
+    在最大功率条件下：
+    - 负载电阻 \( R负载 \) 应设置为与热电模块的内部电阻 \( R \) 相同。
+
+    **最大功率的物理意义**：在阻抗匹配的条件下，热电模块可以达到最高的能量转换效率，此时的功率输出是理论上的最大值。这种设置在设计热电发电系统时至关重要，以确保最高的能效。
+    """)
+
+
+    st.write("""
+    ### 最大功率电流
+    最大电流I发生在负载电阻等于内部电阻。此时，电流的计算公式为：
+    """)
+    st.latex(r'''
+    I_{\text{Pmax}} = \frac{S \cdot \Delta T}{2}
+    ''')
+    st.write("""
+    **最大电流的物理意义**：最大电流表示热电模块在短路条件下能产生的最大电流值，这对于理解和测试模块的电气特性非常重要。
+
+    ### 热端热流 \( Qh \)
+    热端热流 \( Qh \) 是指从热源通过热电模块到冷端的热能传递。其计算公式依赖于多个因素，包括热电模块的热电性能参数和温差：
+    """)
+    st.latex(r'''
+    Q_h = \alpha_{\text{总}} \cdot T_c \cdot I + K(T_h - T_c) + \frac{1}{2} I^2 R
+    ''')
+    st.write("""
+    其中
+    - \( K \) 为热电模块的热导率。
+    - \( α总 \) 为N和P的温度区间平均Seebeck系数。
+
+    **热流的物理意义**：热端热流量是评估热电模块热效率的关键参数，表明了热能从热源到冷端的流动效率。
+
+    ### 转换效率 \( η \)
+    转换效率 \( η \) 表示热能转换为电能的效率，计算公式为：
+    """)
+    st.latex(r'''
+    \eta = \frac{P_{\text{out}}}{Q_h}
+    ''')
+    st.write("""
+    **转换效率的物理意义**：转换效率是衡量热电模块性能的核心指标，高效率意味着更多的热能被有效转换为电能。
+    """)
 
 
 
 # 显示公式
-st.write("""## 参考公式""")
+st.write("""## 计算程序""")
 
 # 定义函数用于计算材料属性
 def calculate_coefficient(T, a, b, c, d):
@@ -440,53 +471,64 @@ with st.expander("计算结果", expanded=True):
 
 
 
-    st.write("### 计算结果")
-    st.metric(label="N型材料温度区间平均Seebeck系数", value=f"{avg_seebeck_n:.3e} V/K")
-    st.metric(label="P型材料温度区间平均Seebeck系数", value=f"{avg_seebeck_p:.3e} V/K")
-    st.metric(label="温度区间总平均Seebeck系数", value=f"{S_total:.3e} V/K")
-    st.metric(label="N型材料温度区间平均导热率", value=f"{avg_lambda_n:.3f} Ω·m")
-    st.metric(label="P型材料温度区间平均导热率", value=f"{avg_lambda_p:.3f} Ω·m")    
-    st.metric(label="N型材料温度区间平均电阻率", value=f"{avg_rho_n:.3e} Ω·m")
-    st.metric(label="P型材料温度区间平均电阻率", value=f"{avg_rho_p:.3e} Ω·m")
-    st.metric(label="总电阻", value=f"{R_total:.3e} Ω")
-    st.metric(label="温度区间平均ZT值", value=f"{ZT:.3f} ")  
-    st.metric(label="总电压", value=f"{U:.3f} V")        
 
+# 主要结果展示
 
-    # 使用 Streamlit 显示结果
-    st.metric(label="电流密度", value=f"{J/1000000:.3f} A/mm²")
-    st.metric(label="最大功率下的电流", value=f"{I_max_power:.3f} A")   
-    st.metric(label="最大输出电功率", value=f"{P_max:.3f} W")
+with st.expander("计算结果摘要",expanded=True):
+    st.write("### 计算结果摘要")
+    col1, col2, col3 = st.columns(3)
+    with col1:
+        st.metric(label="N型材料平均Seebeck系数", value=f"{avg_seebeck_n:.3e} V/K")
+        st.metric(label="P型材料平均Seebeck系数", value=f"{avg_seebeck_p:.3e} V/K")
+        st.metric(label="总平均Seebeck系数", value=f"{S_total:.3e} V/K")
+    with col2:
+        st.metric(label="N型材料平均导热率", value=f"{avg_lambda_n:.3f} Ω·m")
+        st.metric(label="P型材料平均导热率", value=f"{avg_lambda_p:.3f} Ω·m")
+        st.metric(label="总电阻", value=f"{R_total:.3e} Ω")
+    with col3:
+        st.metric(label="电流密度", value=f"{J/1000000:.3f} A/mm²")
+        st.metric(label="总电压", value=f"{U:.3f} V")
+        st.metric(label="温度区间平均ZT值", value=f"{ZT:.3f}")
 
+    # 高级电力计算展示
+    st.write("### 电力输出详情")
+    col4, col5, col6 = st.columns(3)
+    with col4:
+        st.metric(label="最大功率下的电流", value=f"{I_max_power:.3f} A")
+    with col5:    
+        st.metric(label="最大输出电功率", value=f"{P_max:.3f} W")
+    with col6:
+        st.metric(label="电流密度", value=f"{J/1000000:.3f} A/mm²")
 
-    # 显示计算结果
-    st.write("### 最大功率下的热流")
-    st.latex(r'''
-    Q_h = \alpha_{\text{总}} \cdot T_c \cdot I + K(T_h - T_c) + \frac{1}{2} I^2 R
-    ''')
-    st.metric(label="Seebeck效应产生的热流", value=f"{Q_Seebeck:.3f} W")
-    st.metric(label="热导产生的热流", value=f"{Q_conductive:.3f} W")
-    st.metric(label="焦耳热产生的热流", value=f"{Q_joule:.3f} W")
-    st.metric(label="总热流", value=f"{Q_h:.3f} W")
+# 增加电池个数的展示
+with st.expander("增加电池个数"):
+    st.write("### 配置选项")
+    SN = st.number_input('电池个数', value=1, min_value=1, max_value=100000, step=1)
+    Q_joule_n = 0.5 * I_max_power**2 * SN * R_total
+    P_max_n = (S_total * Delta_T)**2 / (4 * SN * rho_total)  # 重新计算最大功率
+    Q_h_n = Q_h - Q_joule + Q_joule_n
+    eta_n = P_max / Q_h_n
+    st.write("### 计算影响")
+    col1, col2, col3, col4 = st.columns(4)
+    with col1:
+        st.metric(label=f"{SN}个串联电池总电阻", value=f"{SN*R_total:.3f} Ω")
+    with col2:
+        st.metric(label=f"{SN}个串联电池总电压", value=f"{SN*U:.3f} V")
+    with col3:
+        st.metric(label=f"{SN}个串联电池最大功率下的电流", value=f"{I_max_power:.3f} A")
+    with col4:
+        st.metric(label=f"{SN}个串联电池最大输出电功率", value=f"{P_max_n:.3f} W")
+    st.write("### 热流分析")
+    col5, col6, col7, col8 = st.columns(4)
+    with col5:
+        st.metric(label="Seebeck效应热", value=f"{Q_Seebeck:.3f} W")
+    with col6:
+        st.metric(label="热导损失热流", value=f"{Q_conductive:.3f} W")
+    with col7:
+        st.metric(label="焦耳热产生的热", value=f"{Q_joule_n:.3f} W")
+    with col8:
+        st.metric(label=f"{SN}个电池的总热流", value=f"{Q_h_n:.3f} W")
 
-    # 使用 st.metric 显示转换效率，格式化为百分比
-    st.write("### 最大功率转换效率")
-    st.metric(label="效率", value=f"{eta*100:.3f}%")
-
-
-
-
-
-
-# 变温度计算
-# 变温度计算
-# 变温度计算
-# 变温度计算
-# 变温度计算
-# 变温度计算
-# 变温度计算
-# 变温度计算
-# 变温度计算
 # 变温度计算
 # 变温度计算
 # 变温度计算
@@ -666,9 +708,9 @@ with st.expander("温度曲线图"):
     # 绘制热流曲线
     fig, ax = plt.subplots(figsize=(8, 6))
     ax.plot(T_range, Q_h_values, label='总热流 Qh', color='green')  # 使用普通文本而不是LaTeX
-    ax.plot(T_range, Q_Seebeck_values, label='Seebeck效应热流 QSeebeck', color='orange')  # 使用普通文本
-    ax.plot(T_range, Q_conductive_values, label='热导热流 Qconductive', color='purple')  # 使用普通文本
-    ax.plot(T_range, Q_joule_values, label='焦耳热流 Qjoule', color='brown')  # 使用普通文本
+    ax.plot(T_range, Q_Seebeck_values, label='Seebeck效应热 QSeebeck', color='orange')  # 使用普通文本
+    ax.plot(T_range, Q_conductive_values, label='热导损失热流 Qconductive', color='purple')  # 使用普通文本
+    ax.plot(T_range, Q_joule_values, label='焦耳热 Qjoule', color='brown')  # 使用普通文本
     ax.set_xlabel(u'温度 (K)')
     ax.set_ylabel(u'热流 (W)')
     ax.set_title('不同热流随温度变化')
@@ -684,6 +726,16 @@ with st.expander("温度曲线图"):
     ax.set_title('最大效率随温度变化')
     ax.legend()
     st.pyplot(fig)
+
+
+
+
+
+
+
+
+
+
 
 
 
