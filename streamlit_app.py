@@ -196,11 +196,63 @@ with st.expander("参考公式"):
     st.write("""
     **转换效率的物理意义**：转换效率是衡量热电模块性能的核心指标，高效率意味着更多的热能被有效转换为电能。
     """)
+        
+    st.write("""
+    ### 逐温度点计算物性值与平均值法的差异
+
+    #### 1. 逐温度点计算物性值
+    - **特点**：
+    - 精度高：逐点计算直接捕捉材料物性随温度的非线性变化。
+    - 适用场景：材料物性随温度变化显著（如热导率、电阻率、Seebeck 系数等），或需要研究温度梯度的精确场景。
+    - 计算复杂度高：逐点计算消耗更多资源，尤其在温度范围较大时。
+    - **公式**：
+    """)
+    st.latex(r"\text{结果} = \sum_{T \in T_\text{range}} f(T)")
+    st.write("""
+    - 示例代码：
+        ```python
+        lambda_total = calculate_coefficient(T, lambda_a_n, lambda_b_n, lambda_c_n, lambda_d_n) + \
+                    calculate_coefficient(T, lambda_a_p, lambda_b_p, lambda_c_p, lambda_d_p)
+        ```
+
+    #### 2. 平均值法
+    - **特点**：
+    - 精度较低：将温度区间内的物性值简化为平均值，可能忽略温度变化带来的影响。
+    - 适用场景：材料物性随温度变化较小（几乎线性），或快速估算的场景。
+    - 计算效率高：减少逐点计算，只需一次平均值。
+    - **公式**：
+    """)
+    st.latex(r"\text{平均值} = \frac{1}{T_h - T_c} \int_{T_c}^{T_h} f(T) \, dT")
+    st.write("""
+    - 示例代码：
+        ```python
+        avg_lambda_n = calculate_average_property(lambda_func, T_c, T_h, coeffs_lambda_n)
+        ```
+
+    #### 3. 如何选择
+    - **检查物性随温度变化**：
+    - 如果非线性显著，选择逐温度点计算。
+    - 如果变化平缓或接近线性，平均值法足够精确。
+    - **验证两种方法的结果**：
+    - 分别计算并对比两种方法的结果：
+    """)
+    st.latex(r"ZT_\text{total} = \sum_{T \in T_\text{range}} ZT(T)")
+    st.latex(r"ZT_\text{avg} = \frac{S_\text{avg}^2 \cdot T_\text{avg}}{\lambda_\text{avg} \cdot \rho_\text{avg}}")
+    st.write("""
+    - 如果差异显著，优先逐温度点计算。
+
+    #### 4. 实际应用建议
+    - 初始阶段使用逐温度点计算，确保模型精确性。
+    - 若物性随温度变化不显著，可切换为平均值法提高计算效率。
+    - 在关键温度区间可使用非均匀采样优化逐温度点计算。
+    """)
 
 
 
-# 显示公式
-st.write("""## 计算程序""")
+
+
+
+
 
 # 定义函数用于计算材料属性
 def calculate_coefficient(T, a, b, c, d):
@@ -707,7 +759,7 @@ ZT_values = calculate_ZT(T_range, a_n, b_n, c_n, d_n, a_p, b_p, c_p, d_p,
                          lambda_a_n, lambda_b_n, lambda_c_n, lambda_d_n, lambda_a_p, lambda_b_p, lambda_c_p, lambda_d_p)
 
 # 自定义导热率公式
-with st.expander("温度曲线图"):
+with st.expander("逐点温度曲线图"):
 # 绘制ZT曲线图
     fig, ax = plt.subplots(figsize=(8, 6))
     ax.plot(T_range, ZT_values, label=r'ZT（P和N）', color='green')
@@ -782,9 +834,11 @@ with st.expander("温度曲线图"):
 
 
     # 计算电压
-    def calculate_voltage(S_total, Delta_T, R_total):
-        I = (S_total * Delta_T) / R_total  # 计算电流
-        U = P_max / I  # 使用最大功率和电流计算电压
+
+        # 定义计算电压的函数
+    def calculate_voltage(S_total, Delta_T, R_total=1):
+        # 使用 Seebeck 系数和温差计算电压
+        U = S_total * Delta_T
         return U
 
     # 计算每个温度下的电压
@@ -793,24 +847,55 @@ with st.expander("温度曲线图"):
     for T in T_range:
         Delta_T = T - T_c  # 计算温差
         S_total = abs(calculate_coefficient(T, a_n, b_n, c_n, d_n)) + abs(calculate_coefficient(T, a_p, b_p, c_p, d_p))
-        lambda_total = calculate_coefficient(T, lambda_a_n, lambda_b_n, lambda_c_n, lambda_d_n) + calculate_coefficient(T, lambda_a_p, lambda_b_p, lambda_c_p, lambda_d_p)
-        rho_total = calculate_coefficient(T, rho_a_n, rho_b_n, rho_c_n, rho_d_n) + calculate_coefficient(T, rho_a_p, rho_b_p, rho_c_p, rho_d_p)
-
-        # 计算最大功率
-        P_max = calculate_max_power(S_total, Delta_T, rho_total)
-
+        
         # 计算电压
-        voltage = calculate_voltage(S_total, Delta_T, rho_total)
+        voltage = calculate_voltage(S_total, Delta_T)
         voltage_values.append(voltage)
 
-    # 绘制电压关于温度的曲线
+    # 创建数据表
+
+    data = pd.DataFrame({
+        "温度 (K)": T_range,
+        "电压 (V)": voltage_values
+    })
+
+    # 静态图：绘制电压随温度变化的曲线
     fig, ax = plt.subplots(figsize=(8, 6))
     ax.plot(T_range, voltage_values, label='电压 U', color='purple')
-    ax.set_xlabel(u'温度 (K)')
-    ax.set_ylabel(u'电压 (V)')
+    ax.set_xlabel('温度 (K)')
+    ax.set_ylabel('电压 (V)')
     ax.set_title('电压随温度变化')
     ax.legend()
+
+
+    # 动态滑块：选择具体温度并显示对应电压
+    selected_temp = st.slider(
+        "选择温度 (K)", 
+        min_value=float(min(T_range)), 
+        max_value=float(max(T_range)), 
+        step=float(T_range[1] - T_range[0])  # 动态计算步长
+    )
+
+    # 确保 T_range 是 numpy 数组
+    T_range = np.array(T_range)
+
+    # 找到最接近的温度索引
+    closest_index = np.abs(T_range - selected_temp).argmin()
+    selected_voltage = voltage_values[closest_index]
+
+    # 显示结果
+    st.write(f"在温度 {T_range[closest_index]} K 时，电压为 {selected_voltage:.8f} V")
+
+
+
+    # 显示静态图
+    st.write("### 静态图：电压随温度变化")
     st.pyplot(fig)
+
+    # 显示表格数据，支持屏幕自适应
+    st.write("### 表格数据：电压和温度对应关系")
+    st.dataframe(data, use_container_width=True)
+
 
 
 
