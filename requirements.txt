@@ -5,3 +5,17 @@ scipy
 pandas
 scikit-image
 pdfkit
+streamlit-option-menu
+opencv-python
+pillow
+reportlab
+seaborn
+plotly
+fuzzywuzzy
+python-decouple
+beautifulsoup4
+lxml
+pytest
+openpyxl
+pygments
+markdown
